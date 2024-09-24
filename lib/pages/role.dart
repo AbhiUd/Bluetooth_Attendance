@@ -1,4 +1,3 @@
-import 'package:bluetooth_attendance/pages/login_page.dart';
 import 'package:flutter/material.dart';
 
 class RolesPage extends StatelessWidget {
@@ -35,10 +34,7 @@ class RolesPage extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginPage()));
+                          Navigator.of(context).pushNamed('/loginpage');
                         },
                         child: Image.asset(
                           'assets/images/student.png',
@@ -58,10 +54,7 @@ class RolesPage extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginPage()));
+                          Navigator.of(context).pushNamed('/loginpage');
                         },
                         child: Image.asset(
                           'assets/images/teacher.png',
