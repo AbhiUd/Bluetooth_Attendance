@@ -1,4 +1,5 @@
-import 'package:bluetooth_attendance/pages/role.dart';
+//import 'package:bluetooth_attendance/pages/role.dart';
+import 'package:bluetooth_attendance/pages/student_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color.fromRGBO(92, 89, 145, 87),
       ),
       themeMode: ThemeMode.dark,
-      home: const RolesPage(),
+      home: const StudentPage(),
     );
   }
 }
