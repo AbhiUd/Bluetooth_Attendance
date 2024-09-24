@@ -2,6 +2,7 @@ import 'package:bluetooth_attendance/pages/blank_page.dart';
 import 'package:bluetooth_attendance/pages/login_page.dart';
 import 'package:bluetooth_attendance/pages/register_page.dart';
 import 'package:bluetooth_attendance/pages/role.dart';
+import 'package:bluetooth_attendance/pages/student_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
         '/loginpage': (BuildContext context) => const LoginPage(),
         '/test': (BuildContext context) => const TestingPage(),
         '/registerpage': (BuildContext context) => const RegisterPage(),
+        '/studentpage': (BuildContext context) => const StudentPage(),
       },
     );
   }

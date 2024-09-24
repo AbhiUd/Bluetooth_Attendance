@@ -108,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
                       if (emailTextContoller.text.isNotEmpty &&
                           passwordTextContoller.text.isNotEmpty) {
                         Navigator.of(context).pushNamedAndRemoveUntil(
-                          '/test',
+                          '/studentpage',
                           (Route<dynamic> route) => false,
                         );
                       } else {
