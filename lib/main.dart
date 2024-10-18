@@ -1,4 +1,7 @@
-//import 'package:bluetooth_attendance/pages/role.dart';
+import 'package:bluetooth_attendance/pages/blank_page.dart';
+import 'package:bluetooth_attendance/pages/login_page.dart';
+import 'package:bluetooth_attendance/pages/register_page.dart';
+import 'package:bluetooth_attendance/pages/role.dart';
 import 'package:bluetooth_attendance/pages/student_page.dart';
 import 'package:flutter/material.dart';
 
@@ -16,7 +19,8 @@ class MyApp extends StatelessWidget {
       title: 'Bluetooth Attendance',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromRGBO(21, 18, 55, 1)),
+          seedColor: const Color.fromRGBO(21, 18, 55, 1),
+        ),
         useMaterial3: true,
         fontFamily: "Lato",
         textTheme: const TextTheme(
@@ -30,11 +34,22 @@ class MyApp extends StatelessWidget {
             fontWeight: FontWeight.w900,
             color: Colors.white,
           ),
+          headlineSmall: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
+          ),
         ),
         scaffoldBackgroundColor: const Color.fromRGBO(92, 89, 145, 87),
       ),
       themeMode: ThemeMode.dark,
-      home: const StudentPage(),
+      home: const RolesPage(),
+      routes: <String, WidgetBuilder>{
+        '/loginpage': (BuildContext context) => const LoginPage(),
+        '/test': (BuildContext context) => const TestingPage(),
+        '/registerpage': (BuildContext context) => const RegisterPage(),
+        '/studentpage': (BuildContext context) => const StudentPage(),
+      },
     );
   }
 }
