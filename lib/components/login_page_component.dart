@@ -11,10 +11,12 @@ class SubmitButton extends StatelessWidget {
     required this.emailTextContoller,
     required this.passwordTextContoller,
     required this.onTap,
+    required this.text,
   });
 
   final TextEditingController emailTextContoller;
   final TextEditingController passwordTextContoller;
+  final String text;
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +26,8 @@ class SubmitButton extends StatelessWidget {
         backgroundColor: const Color.fromRGBO(86, 183, 221, 1),
         minimumSize: const Size(double.infinity, 50),
       ),
-      child: const Text(
-        "Login",
+      child: Text(
+        text,
         style: TextStyle(
           fontWeight: FontWeight.w800,
           color: Colors.white,

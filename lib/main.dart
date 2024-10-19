@@ -2,8 +2,12 @@ import 'package:bluetooth_attendance/pages/blank_page.dart';
 import 'package:bluetooth_attendance/pages/login_page.dart';
 import 'package:bluetooth_attendance/pages/register_page.dart';
 import 'package:bluetooth_attendance/pages/role.dart';
+import 'package:bluetooth_attendance/pages/scanning_page.dart';
 import 'package:bluetooth_attendance/pages/student_page.dart';
-import 'package:bluetooth_attendance/pages/teacher_page.dart';
+import 'package:bluetooth_attendance/pages/teacher_attendance.dart';
+import 'package:bluetooth_attendance/pages/teacher_landing_page.dart';
+import 'package:bluetooth_attendance/pages/teacher_login_page.dart';
+import 'package:bluetooth_attendance/pages/teacher_register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -62,10 +66,15 @@ class MyApp extends StatelessWidget {
       routes: <String, WidgetBuilder>{
         '/rolespage': (BuildContext context) => const RolesPage(),
         '/loginpage': (BuildContext context) => const LoginPage(),
+        '/teacherloginpage': (BuildContext context) => const TeacherLoginPage(),
         '/test': (BuildContext context) => const TestingPage(),
         '/registerpage': (BuildContext context) => const RegisterPage(),
+        '/teacherregisterpage': (BuildContext context) =>
+            const TeacherRegisterPage(),
         '/studentpage': (BuildContext context) => const StudentPage(),
-        '/teacherpage': (BuildContext context) => const TeacherScanPage(),
+        '/teacherpage': (BuildContext context) => const Teacher_Landing_Page(),
+        '/attendancepage': (BuildContext context) => const TeacherAttendance(),
+        '/scanningpage': (BuildContext context) => const ScanningPage(),
         '/registerpage2': (BuildContext context) => const RegisterPage2(),
       },
     );

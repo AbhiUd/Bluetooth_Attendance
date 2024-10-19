@@ -2,14 +2,14 @@ import 'package:bluetooth_attendance/components/login_page_component.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class TeacherLoginPage extends StatefulWidget {
+  const TeacherLoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<TeacherLoginPage> createState() => _TeacherLoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _TeacherLoginPageState extends State<TeacherLoginPage> {
   late bool _isObscure;
 
   final TextEditingController emailTextContoller = TextEditingController();
@@ -105,23 +105,18 @@ class _LoginPageState extends State<LoginPage> {
                     onTap: () async {
                       if (emailTextContoller.text.isNotEmpty &&
                           passwordTextContoller.text.isNotEmpty) {
-                        final deviceId = await getDeviceIdentifier();
                         final response = await Supabase.instance.client
-                            .from('student_details')
+                            .from('teacher_details')
                             .select()
                             .eq('emailid', emailTextContoller.text)
                             .eq('password', passwordTextContoller.text);
 
                         if (response.isNotEmpty) {
-                          final identifier = response[0]['identifier'];
-                          if (identifier == deviceId) {
-                            await saveUUID(response[0]['uuid']);
-                            if (context.mounted) {
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                '/studentpage',
-                                (Route<dynamic> route) => false,
-                              );
-                            }
+                          if (context.mounted) {
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                              '/teacherpage',
+                              (Route<dynamic> route) => false,
+                            );
                           }
                         } else {
                           if (context.mounted) {
@@ -178,7 +173,7 @@ class _LoginPageState extends State<LoginPage> {
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pushNamed(
-                        '/registerpage',
+                        '/teacherregisterpage',
                       );
                     },
                     child: const Text.rich(

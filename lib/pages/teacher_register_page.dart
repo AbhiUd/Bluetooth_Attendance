@@ -2,14 +2,14 @@ import 'package:bluetooth_attendance/components/login_page_component.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class TeacherRegisterPage extends StatefulWidget {
+  const TeacherRegisterPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<TeacherRegisterPage> createState() => _TeacherRegisterPage();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _TeacherRegisterPage extends State<TeacherRegisterPage> {
   final TextEditingController emailTextContoller = TextEditingController();
 
   @override
@@ -61,7 +61,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   onTap: () async {
                     if (emailTextContoller.text.isNotEmpty) {
                       final response = await Supabase.instance.client
-                          .from('predefined_details')
+                          .from('teacher_predefined_details')
                           .select()
                           .eq('registered_status', false)
                           .eq('emailid', emailTextContoller.text);
@@ -75,7 +75,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => RegisterPage2(
+                              builder: (context) => TeacherRegisterPage2(
                                 emailId: emailTextContoller.text,
                               ),
                             ),
@@ -162,19 +162,19 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 }
 
-class RegisterPage2 extends StatefulWidget {
+class TeacherRegisterPage2 extends StatefulWidget {
   final dynamic emailId;
 
-  const RegisterPage2({
+  const TeacherRegisterPage2({
     super.key,
     this.emailId,
   });
 
   @override
-  State<RegisterPage2> createState() => _RegisterPage2State();
+  State<TeacherRegisterPage2> createState() => _TeacherRegisterPage2State();
 }
 
-class _RegisterPage2State extends State<RegisterPage2> {
+class _TeacherRegisterPage2State extends State<TeacherRegisterPage2> {
   final TextEditingController newPassTextContoller = TextEditingController();
   final TextEditingController confirmPassTextContoller =
       TextEditingController();
@@ -225,30 +225,22 @@ class _RegisterPage2State extends State<RegisterPage2> {
                             confirmPassTextContoller.text.isNotEmpty) &&
                         (newPassTextContoller.text ==
                             confirmPassTextContoller.text)) {
-                      final deviceId = await getDeviceIdentifier();
-                      final uuid = generateUUID();
-                      print("DeviceId : $deviceId");
-                      final student_detail = await Supabase.instance.client
-                          .from("predefined_details")
+                      final teacher_detail = await Supabase.instance.client
+                          .from("teacher_predefined_details")
                           .select()
                           .eq("emailid", widget.emailId);
 
                       final response = await Supabase.instance.client
-                          .from('student_details')
+                          .from('teacher_details')
                           .insert({
                         'emailid': widget.emailId,
                         'password': newPassTextContoller.text,
-                        'identifier': deviceId,
-                        'uuid': uuid,
-                        'prn': student_detail[0]["prn"],
-                        'class': student_detail[0]["class"],
-                        'division': student_detail[0]["division"],
-                        'name': student_detail[0]['name'],
+                        'name': teacher_detail[0]['name'],
                       });
                       print(response);
                       if (response == null) {
                         final update = await Supabase.instance.client
-                            .from("predefined_details")
+                            .from("teacher_predefined_details")
                             .update({"registered_status": true}).match(
                                 {"emailid": widget.emailId});
                         if (context.mounted) {

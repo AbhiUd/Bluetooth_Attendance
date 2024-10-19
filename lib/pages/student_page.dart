@@ -136,15 +136,19 @@
 //   }
 // }
 
+import 'dart:async';
+import 'dart:io';
+
 import 'package:bluetooth_attendance/components/login_page_component.dart';
+import 'package:bluetooth_attendance/pages/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ble_peripheral/flutter_ble_peripheral.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart'; // Import to check Bluetooth state
-import 'package:permission_handler/permission_handler.dart'; // For permission checks
+import 'package:permission_handler/permission_handler.dart';
+import 'package:rflutter_alert/rflutter_alert.dart'; // For permission checks
 
 class StudentPage extends StatefulWidget {
   const StudentPage({super.key});
-
   @override
   State<StudentPage> createState() => _StudentPageState();
 }
@@ -155,7 +159,7 @@ class _StudentPageState extends State<StudentPage> {
   bool _isSupported = false;
   bool _bluetoothEnabled = false;
   late String studentUUID;
-  // Unique for each student
+  StreamSubscription<BluetoothAdapterState>? _bluetoothSubscription;
 
   @override
   void initState() {
@@ -164,76 +168,127 @@ class _StudentPageState extends State<StudentPage> {
     _checkBluetooth(); // Check Bluetooth status on init
   }
 
+  @override
+  void dispose() {
+    _bluetoothSubscription?.cancel();
+    super.dispose();
+  }
+
   // Check if BLE advertising is supported on the device
   Future<void> _checkSupport() async {
-    studentUUID = (await getUUID())!;
+    studentUUID = (await getUUID())!; // Fetch student-specific UUID
     bool supported = await _blePeripheral.isSupported;
     setState(() {
       _isSupported = supported;
     });
   }
 
-  // Check Bluetooth state
+  // Check Bluetooth permissions and state
   Future<void> _checkBluetooth() async {
-    PermissionStatus bluetoothScanStatus =
-        await Permission.bluetoothScan.request();
-    PermissionStatus bluetoothConnectStatus =
-        await Permission.bluetoothConnect.request();
+    try {
+      // Check if Bluetooth is supported
+      if (!(await FlutterBluePlus.isSupported)) {
+        _showSnackBar(context, 'Bluetooth not supported by this device');
+        return;
+      }
 
-    if (bluetoothScanStatus.isGranted && bluetoothConnectStatus.isGranted) {
-      _listenToBluetoothState();
-    } else {
-      _showBluetoothPermissionDenied();
+      // Request Bluetooth permissions (only for Android)
+      if (Platform.isAndroid) {
+        PermissionStatus bluetoothScanStatus =
+            await Permission.bluetoothScan.request();
+        PermissionStatus bluetoothConnectStatus =
+            await Permission.bluetoothConnect.request();
+
+        if (bluetoothScanStatus.isGranted && bluetoothConnectStatus.isGranted) {
+          _listenToBluetoothState();
+        } else if (bluetoothScanStatus.isDenied ||
+            bluetoothConnectStatus.isDenied) {
+          _showSnackBar(
+              context, 'Bluetooth permission is required for attendance');
+        } else if (bluetoothScanStatus.isPermanentlyDenied ||
+            bluetoothConnectStatus.isPermanentlyDenied) {
+          openAppSettings(); // Direct the user to app settings if permission is permanently denied
+        }
+      } else {
+        // For non-Android platforms, directly listen to Bluetooth state
+        _listenToBluetoothState();
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
   // Listen to Bluetooth adapter state
   void _listenToBluetoothState() {
-    FlutterBluePlus.adapterState.listen((BluetoothAdapterState state) {
+    _bluetoothSubscription =
+        FlutterBluePlus.adapterState.listen((BluetoothAdapterState state) {
       setState(() {
-        _bluetoothEnabled = state == BluetoothAdapterState.on;
+        _bluetoothEnabled = (state == BluetoothAdapterState.on);
       });
+
+      if (state == BluetoothAdapterState.off) {
+        _showBluetoothAlert();
+      }
     });
   }
 
-  // Show alert if Bluetooth permissions are denied
-  void _showBluetoothPermissionDenied() {
-    showDialog(
+  // Show alert if Bluetooth is disabled
+  void _showBluetoothAlert() {
+    Alert(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Bluetooth Permission Denied"),
-        content:
-            Text("Please enable Bluetooth permissions in the app settings."),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text("OK"),
-          ),
-        ],
-      ),
+      type: AlertType.warning,
+      title: "Bluetooth Disabled",
+      desc: "Please turn on Bluetooth for attendance.",
+      buttons: [
+        DialogButton(
+          onPressed: () {
+            Navigator.pop(context);
+            _bluetoothSubscription
+                ?.cancel(); // Stop listening when dialog is dismissed
+          },
+          child: const Text("Cancel"),
+        ),
+        DialogButton(
+          onPressed: () async {
+            try {
+              // Attempt to turn on Bluetooth (Android only)
+              if (Platform.isAndroid) {
+                await FlutterBluePlus.turnOn();
+              }
+            } catch (e) {
+              print("Failed to turn on Bluetooth: $e");
+              _showSnackBar(
+                  context, 'Unable to enable Bluetooth automatically');
+            }
+            Navigator.pop(context);
+          },
+          child: const Text("OK"),
+        ),
+      ],
+    ).show();
+  }
+
+  // Show a SnackBar
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
     );
   }
 
-  // Start or stop advertising UUID
+  // Toggle Bluetooth Advertising
   Future<void> _toggleAdvertising() async {
     if (_isAdvertising) {
       await _blePeripheral.stop();
       print("Advertising stopped.");
     } else {
-      print("Entered Advertising State");
       AdvertiseData advertiseData = AdvertiseData(
-        serviceUuid: studentUUID, // UUID identifying the student
-        localName:
-            "Student_${studentUUID.substring(0, 8)}", // Can be student's name or part of UUID
+        serviceUuid: studentUUID,
+        localName: "Student_${studentUUID.substring(0, 8)}",
         manufacturerId: 1234,
-        // manufacturerData: Uint8List.fromList([1, 2, 3, 4]), // Optional additional data
       );
-
       await _blePeripheral.start(advertiseData: advertiseData);
-      final localName = advertiseData.localName;
-      print("Advertising started. \n $localName");
+      print("Advertising started.");
     }
-
     setState(() {
       _isAdvertising = !_isAdvertising;
     });
@@ -241,92 +296,21 @@ class _StudentPageState extends State<StudentPage> {
 
   @override
   Widget build(BuildContext context) {
-    const IconData person = IconData(0xee35, fontFamily: 'MaterialIcons');
-
     return Scaffold(
-      // backgroundColor: Theme.of(context).primaryColor,
-      appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(92, 89, 145, 87),
-        elevation: 0,
-        toolbarHeight: 90,
-        leading: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: IconButton(
-            icon: const Icon(
-              person,
-              size: 60,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              print('Person icon pressed');
-            },
-          ),
-        ),
-        title: Image.asset("assets/images/student.png",
-            height: 80, width: 80, color: Colors.white),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: IconButton(
-              icon: const Icon(
-                Icons.notification_add_outlined,
-                size: 50,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                print("Notification is pressed");
-              },
-            ),
-          ),
-        ],
+      appBar: appbarWidget(
+        iconD: 'student',
       ),
-      body: SizedBox(
-        width: double.maxFinite,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 100),
-            ElevatedButton(
-              onPressed: () {
-                if (_bluetoothEnabled && _isSupported) {
-                  _toggleAdvertising();
-                } else {
-                  _showBluetoothDisabledAlert();
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromRGBO(
-                    217, 217, 217, 1), // Set background color
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text(
-                'Attendance ',
-                style: TextStyle(fontSize: 30),
-              ),
-            )
-          ],
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            if (_bluetoothEnabled && _isSupported) {
+              _toggleAdvertising();
+            } else {
+              _showBluetoothAlert();
+            }
+          },
+          child: const Text("Start Attendance"),
         ),
-      ),
-    );
-  }
-
-  // Show alert when Bluetooth is disabled
-  void _showBluetoothDisabledAlert() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Bluetooth Disabled"),
-        content: Text("Please enable Bluetooth to start attendance."),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text("OK"),
-          ),
-        ],
       ),
     );
   }

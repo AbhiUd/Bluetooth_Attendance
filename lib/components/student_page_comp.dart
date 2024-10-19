@@ -85,6 +85,7 @@ void _showBluetoothAlert(BuildContext context,
           border: Border.all(color: Colors.black, width: 2),
           onPressed: () {
             Navigator.pop(context);
+            Navigator.pop(context);
             subscription?.cancel();
           },
           color: const Color.fromARGB(112, 253, 135, 111),

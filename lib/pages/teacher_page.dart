@@ -37,7 +37,7 @@ class _TeacherScanPageState extends State<TeacherScanPage> {
 
       for (var result in results) {
         // Fallback for devices without a localName
-        // ignore: deprecated_member_use
+
         String deviceName = result.advertisementData.localName.isNotEmpty
             ? result.advertisementData.localName
             : result.device.remoteId

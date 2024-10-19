@@ -55,7 +55,7 @@ class RolesPage extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context).pushNamed('/teacherpage');
+                          Navigator.of(context).pushNamed('/teacherloginpage');
                         },
                         child: Image.asset(
                           'assets/images/teacher.png',
