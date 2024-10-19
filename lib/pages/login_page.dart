@@ -1,4 +1,6 @@
+import 'package:bluetooth_attendance/components/login_page_component.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -57,19 +59,10 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(
                     height: 40,
                   ),
-                  TextField(
-                    controller: emailTextContoller,
-                    decoration: const InputDecoration(
-                      hintText: "Email",
-                      hintStyle: blackColor,
-                      border: border,
-                      enabledBorder: border,
-                      focusedBorder: border,
-                      filled: true,
-                      fillColor: Color.fromRGBO(217, 217, 217, 1),
-                      prefixIcon: Icon(Icons.person),
-                      prefixIconColor: Colors.black87,
-                    ),
+                  EmailTextField(
+                    text: "Email",
+                    emailTextContoller: emailTextContoller,
+                    icon: const Icon(Icons.person),
                   ),
                   const SizedBox(
                     height: 20,
@@ -88,9 +81,11 @@ class _LoginPageState extends State<LoginPage> {
                       prefixIcon: const Icon(Icons.fingerprint),
                       suffixIcon: IconButton(
                         onPressed: () {
-                          setState(() {
-                            _isObscure = !_isObscure;
-                          });
+                          setState(
+                            () {
+                              _isObscure = !_isObscure;
+                            },
+                          );
                         },
                         icon: _isObscure
                             ? const Icon(Icons.visibility)
@@ -103,14 +98,55 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(
                     height: 20,
                   ),
-                  ElevatedButton(
-                    onPressed: () {
+                  SubmitButton(
+                    emailTextContoller: emailTextContoller,
+                    passwordTextContoller: passwordTextContoller,
+                    onTap: () async {
                       if (emailTextContoller.text.isNotEmpty &&
                           passwordTextContoller.text.isNotEmpty) {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          '/studentpage',
-                          (Route<dynamic> route) => false,
-                        );
+                        final deviceId = await getDeviceIdentifier();
+                        final response = await Supabase.instance.client
+                            .from('student_details')
+                            .select()
+                            .eq('emailid', emailTextContoller.text)
+                            .eq('password', passwordTextContoller.text);
+
+                        if (response.isNotEmpty) {
+                          final identifier = response[0]['identifier'];
+                          if (identifier == deviceId) {
+                            await saveUUID(response[0]['uuid']);
+                            if (context.mounted) {
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/studentpage',
+                                (Route<dynamic> route) => false,
+                              );
+                            }
+                          }
+                        } else {
+                          if (context.mounted) {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text(
+                                    'Please enter a valid email and password',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall,
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: const Text('Ok'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                        }
                       } else {
                         showDialog(
                           context: context,
@@ -134,18 +170,6 @@ class _LoginPageState extends State<LoginPage> {
                         );
                       }
                     },
-                    style: TextButton.styleFrom(
-                      backgroundColor: const Color.fromRGBO(86, 183, 221, 1),
-                      minimumSize: const Size(double.infinity, 50),
-                    ),
-                    child: const Text(
-                      "Login",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        fontSize: 20,
-                      ),
-                    ),
                   ),
                   const SizedBox(
                     height: 20,

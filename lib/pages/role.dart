@@ -7,6 +7,7 @@ class RolesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -54,7 +55,7 @@ class RolesPage extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context).pushNamed('/loginpage');
+                          Navigator.of(context).pushNamed('/teacherpage');
                         },
                         child: Image.asset(
                           'assets/images/teacher.png',
