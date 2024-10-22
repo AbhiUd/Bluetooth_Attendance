@@ -128,9 +128,7 @@ class _TeacherRegisterPage extends State<TeacherRegisterPage> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed(
-                      '/loginpage',
-                    );
+                    Navigator.of(context).pop();
                   },
                   child: const Text.rich(
                     TextSpan(

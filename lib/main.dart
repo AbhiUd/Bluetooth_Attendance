@@ -1,3 +1,4 @@
+import 'package:bluetooth_attendance/pages/absentee_page.dart';
 import 'package:bluetooth_attendance/pages/blank_page.dart';
 import 'package:bluetooth_attendance/pages/login_page.dart';
 import 'package:bluetooth_attendance/pages/register_page.dart';
@@ -75,6 +76,7 @@ class MyApp extends StatelessWidget {
         '/teacherpage': (BuildContext context) => const Teacher_Landing_Page(),
         '/attendancepage': (BuildContext context) => const TeacherAttendance(),
         '/scanningpage': (BuildContext context) => const ScanningPage(),
+        '/absenteepage': (BuildContext context) => const AbsenteePage(),
         '/registerpage2': (BuildContext context) => const RegisterPage2(),
       },
     );

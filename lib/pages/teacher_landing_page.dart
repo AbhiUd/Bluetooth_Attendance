@@ -1,5 +1,6 @@
 import 'package:bluetooth_attendance/components/student_page_comp.dart';
 import 'package:bluetooth_attendance/pages/common.dart';
+import 'package:bluetooth_attendance/pages/teacher_attendance.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -83,7 +84,15 @@ class Teacher_Landing_Page extends StatelessWidget {
               ElevatedButton(
                 onPressed: () async {
                   checkBluetooth(context);
-                  Navigator.of(context).pushNamed("/attendancepage");
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation1, animation2) =>
+                          const TeacherAttendance(),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromRGBO(217, 217, 217, 1),

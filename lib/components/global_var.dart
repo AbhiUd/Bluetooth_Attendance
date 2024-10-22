@@ -4,3 +4,7 @@ String? selectedClass;
 String? selectedDiv;
 
 List<String> scannedList = [];
+List<String> absenteeList = [];
+
+String? teacherEmail;
+String? subjectCode;    //Clear it after each use

@@ -1,3 +1,4 @@
+import 'package:bluetooth_attendance/components/global_var.dart';
 import 'package:bluetooth_attendance/components/login_page_component.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -110,7 +111,7 @@ class _TeacherLoginPageState extends State<TeacherLoginPage> {
                             .select()
                             .eq('emailid', emailTextContoller.text)
                             .eq('password', passwordTextContoller.text);
-
+                        teacherEmail = emailTextContoller.text;
                         if (response.isNotEmpty) {
                           if (context.mounted) {
                             Navigator.of(context).pushNamedAndRemoveUntil(
