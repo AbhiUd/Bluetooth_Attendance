@@ -309,7 +309,7 @@ class _StudentPageState extends State<StudentPage> {
               _showBluetoothAlert();
             }
           },
-          child: const Text("Start Attendance"),
+          child: Text(_isAdvertising ? "Stop Broadcast" : "Start Broadcast"),
         ),
       ),
     );

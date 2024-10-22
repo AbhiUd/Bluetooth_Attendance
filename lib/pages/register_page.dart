@@ -128,9 +128,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed(
-                      '/loginpage',
-                    );
+                    Navigator.of(context).pop();
                   },
                   child: const Text.rich(
                     TextSpan(
@@ -246,19 +244,16 @@ class _RegisterPage2State extends State<RegisterPage2> {
                         'name': student_detail[0]['name'],
                       });
                       print(response);
-                      if (response == null) {
-                        final update = await Supabase.instance.client
-                            .from("predefined_details")
-                            .update({"registered_status": true}).match(
-                                {"emailid": widget.emailId});
-                        if (context.mounted) {
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                            '/rolespage',
-                            (Route<dynamic> route) => false,
-                          );
-                        }
-                      } else {
-                        print('Error: ${response.error!.message}');
+
+                      final update = await Supabase.instance.client
+                          .from("predefined_details")
+                          .update({"registered_status": true}).match(
+                              {"emailid": widget.emailId});
+                      if (context.mounted) {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          '/rolespage',
+                          (Route<dynamic> route) => false,
+                        );
                       }
                     } else {
                       showDialog(
