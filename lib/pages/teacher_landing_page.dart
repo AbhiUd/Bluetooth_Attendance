@@ -81,7 +81,11 @@ class Teacher_Landing_Page extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: 100),
-              ElevatedButton(
+              ElevatedButton.icon(icon: Icon(
+            Icons.emoji_people_sharp,
+            color: Colors.black54,
+            size: 30.0,
+          ),
                 onPressed: () async {
                   checkBluetooth(context);
                   Navigator.push(
@@ -101,7 +105,7 @@ class Teacher_Landing_Page extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
+                label: const Text(
                   'Take Attendance ',
                   style: TextStyle(fontSize: 30),
                 ),
@@ -109,7 +113,12 @@ class Teacher_Landing_Page extends StatelessWidget {
               const SizedBox(
                 height: 100,
               ),
-              ElevatedButton(
+              ElevatedButton.icon(
+                icon: Icon(
+            Icons.edit_document,
+            color: Colors.black54,
+            size: 30.0,
+          ),
                 onPressed: () {
                   Navigator.of(context).pushNamed("");
                 },
@@ -120,7 +129,7 @@ class Teacher_Landing_Page extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
+                label: const Text(
                   'Get Report',
                   style: TextStyle(fontSize: 30),
                 ),

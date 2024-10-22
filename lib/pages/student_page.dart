@@ -141,6 +141,7 @@ import 'dart:io';
 
 import 'package:bluetooth_attendance/components/login_page_component.dart';
 import 'package:bluetooth_attendance/pages/common.dart';
+import 'package:bluetooth_attendance/pages/student_subject_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ble_peripheral/flutter_ble_peripheral.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart'; // Import to check Bluetooth state
@@ -301,15 +302,74 @@ class _StudentPageState extends State<StudentPage> {
         iconD: 'student',
       ),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            if (_bluetoothEnabled && _isSupported) {
-              _toggleAdvertising();
-            } else {
-              _showBluetoothAlert();
-            }
-          },
-          child: Text(_isAdvertising ? "Stop Broadcast" : "Start Broadcast"),
+        child: Column(
+          children: [
+
+            SizedBox(height: 100,),
+            ElevatedButton.icon(icon: Icon(
+            Icons.broadcast_on_home_outlined,
+            color: Colors.black54,
+            size: 40.0,
+          ),
+                onPressed: () {
+                if (_bluetoothEnabled && _isSupported) {
+                  _toggleAdvertising();
+                } else {
+                  _showBluetoothAlert();
+                }
+              },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(217, 217, 217, 1),
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                label: Text(_isAdvertising ? "Stop Broadcast" : "Start Broadcast",
+                  style: TextStyle(fontSize: 30),
+                ),
+              ),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     if (_bluetoothEnabled && _isSupported) {
+            //       _toggleAdvertising();
+            //     } else {
+            //       _showBluetoothAlert();
+            //     }
+            //   },
+            //   child: Text(_isAdvertising ? "Stop Broadcast" : "Start Broadcast"),
+            // ),
+            SizedBox(height: 100,),
+            ElevatedButton.icon(
+              icon: Icon(
+            Icons.school,
+            color: Colors.black54,
+            size: 30.0,
+          ),
+                onPressed: () async {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation1, animation2) =>
+                          const StudentSubjectDetail(),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(217, 217, 217, 1),
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                label: const Text(
+                  'check attendence',
+                  style: TextStyle(fontSize: 30),
+                ),
+              ),
+          ],
         ),
       ),
     );
