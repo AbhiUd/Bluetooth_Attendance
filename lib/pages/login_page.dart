@@ -1,4 +1,5 @@
 import 'package:bluetooth_attendance/components/login_page_component.dart';
+import 'package:bluetooth_attendance/pages/common.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -115,6 +116,9 @@ class _LoginPageState extends State<LoginPage> {
                         if (response.isNotEmpty) {
                           final identifier = response[0]['identifier'];
                           if (identifier == deviceId) {
+                            StudentPRN = response[0]['prn'];
+                            Student_year = response[0]['class'];
+                            Student_division = response[0]['division'];
                             await saveUUID(response[0]['uuid']);
                             if (context.mounted) {
                               Navigator.of(context).pushNamedAndRemoveUntil(
