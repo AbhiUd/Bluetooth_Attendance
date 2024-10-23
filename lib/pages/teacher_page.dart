@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 class TeacherScanPage extends StatefulWidget {
-  const TeacherScanPage({Key? key}) : super(key: key);
+  const TeacherScanPage({super.key});
 
   @override
   _TeacherScanPageState createState() => _TeacherScanPageState();

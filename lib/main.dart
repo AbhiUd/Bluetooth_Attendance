@@ -1,3 +1,4 @@
+import 'package:bluetooth_attendance/firebase_options.dart';
 import 'package:bluetooth_attendance/pages/absentee_page.dart';
 import 'package:bluetooth_attendance/pages/blank_page.dart';
 import 'package:bluetooth_attendance/pages/login_page.dart';
@@ -9,16 +10,21 @@ import 'package:bluetooth_attendance/pages/teacher_attendance.dart';
 import 'package:bluetooth_attendance/pages/teacher_landing_page.dart';
 import 'package:bluetooth_attendance/pages/teacher_login_page.dart';
 import 'package:bluetooth_attendance/pages/teacher_register_page.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
+ WidgetsFlutterBinding.ensureInitialized();
+await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+);
+ 
   await Supabase.initialize(
     url: 'https://yibgavrmokwdadpygfdq.supabase.co',
     anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpYmdhdnJtb2t3ZGFkcHlnZmRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc1OTQyMzUsImV4cCI6MjA0MzE3MDIzNX0.P8WXRoU1i3xf76Y3cFq9d-7Vh7dUHLzagKdp4I3o0v0',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpYmdhdnJtb2t3ZGFkcHlnZmRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk3MDI1NzQsImV4cCI6MjA0NTI3ODU3NH0.De1aGN4xT--5RCQAD0g-Bg3cC_di0Ij6bJc35V35PKM',
   );
 
   runApp(const MyApp());

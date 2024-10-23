@@ -105,7 +105,7 @@ void _showBluetoothAlert(BuildContext context,
               }
             } catch (e) {
               if (e is FlutterBluePlusException) {
-                print('Failed to turn on Bluetooth: ${e}');
+                print('Failed to turn on Bluetooth: $e');
                 _showSnackBar(
                     context, 'Please enable Bluetooth manually in settings.');
               } else {

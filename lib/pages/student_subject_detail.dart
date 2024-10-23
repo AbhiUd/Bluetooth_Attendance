@@ -11,140 +11,131 @@ class StudentSubjectDetail extends StatefulWidget {
 }
 
 class _StudentSubjectDetailState extends State<StudentSubjectDetail> {
-  bool _isLoading = true; 
+  bool _isLoading = true;
 
-  List<String> subjectCodes = ['501', '502', '503'];
   List<int> totalClasses = [];
   List<int> studentPresent = [];
-  List<Map<String, dynamic>> subjectData = [
-    {"name": "Software Engineering", "attendance": 0.0},
-    {"name": "Theoretical Computer Science", "attendance": 0.0},
-    {"name": "Deta Warehouse and Mining", "attendance": 0.0},
-  ];
+  List<Map<String, dynamic>> subjectData = [];
 
   @override
   void initState() {
     super.initState();
-    fetchAttendanceCount(subjectCodes);
+    fetchSubjectCodesAndNames();
   }
-  
 
-  
   Future<void> fetchSubjectCodesAndNames() async {
-  setState(() {
-    _isLoading = true; // Start loading
-  });
+    setState(() {
+      _isLoading = true; // Start loading
+    });
 
-  try {
-    final supabase = Supabase.instance.client;
+    try {
+      final supabase = Supabase.instance.client;
 
-    // Debugging: Print Student_year and Student_division values
-    print('Student_year: $Student_year, Student_division: $Student_division');
+      if (Student_year!.isEmpty || Student_division!.isEmpty) {
+        print('Error: Student_year or Student_division is null or empty');
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
 
-    if (Student_year == null || Student_division == null || Student_year!.isEmpty || Student_division!.isEmpty) {
-      print('Error: Student_year or Student_division is null or empty');
+      final response = await supabase
+          .from('subject_detail')
+          .select('subject_code, subject_name')
+          .eq('subject_year', Student_year!)
+          .eq('division', Student_division!);
+
+      print('Supabase response: $response');
+      print('Supabase error: $response');
+
+      if (response.isNotEmpty) {
+        print("Entered Fetchdata Mapping");
+        Iterable<Map<String, dynamic>> fetchedSubjectData =
+            response.map((item) => {
+                  'subject_code': item['subject_code'],
+                  'subject_name': item['subject_name'],
+                });
+
+        setState(() {
+          subjectData = fetchedSubjectData
+              .map((subject) => {
+                    "name": subject['subject_name'],
+                    "code": subject['subject_code'],
+                    "attendance": 0.0,
+                  })
+              .toList();
+        });
+        print("Converted SubjectData: $subjectData ");
+        fetchAttendanceCount();
+      } else {
+        setState(() {
+          _isLoading = false; // Stop loading if no data or error occurs
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false; // Stop loading if an exception occurs
+      });
+      print('Error: $e');
+    }
+  }
+
+  Future<void> fetchAttendanceCount() async {
+    try {
+      final supabase = Supabase.instance.client;
+
+      // Clear lists before adding new data
+      totalClasses.clear();
+      studentPresent.clear();
+
+      for (int i = 0; i < subjectData.length; i++) {
+        final subjectCode = subjectData[i]["code"];
+        final totalClassesResponse = await supabase
+            .from('student_attendance')
+            .select()
+            .eq('subject_code', subjectCode)
+            .eq('prn', StudentPRN!);
+
+        if (totalClassesResponse.isNotEmpty) {
+          totalClasses.add(totalClassesResponse.length);
+        } else {
+          totalClasses.add(0);
+        }
+
+        final studentPresentResponse = await supabase
+            .from('student_attendance')
+            .select()
+            .eq('subject_code', subjectCode)
+            .eq('prn', StudentPRN!)
+            .eq('attendance_status', true);
+
+        if (studentPresentResponse.isNotEmpty) {
+          studentPresent.add(studentPresentResponse.length);
+        } else {
+          studentPresent.add(0);
+        }
+
+        // Calculate attendance percentage
+        if (totalClasses[i] != 0) {
+          double attendancePercentage =
+              (studentPresent[i] / totalClasses[i]) * 100.0;
+
+          setState(() {
+            subjectData[i]['attendance'] = attendancePercentage;
+          });
+        } else {
+          setState(() {
+            subjectData[i]['attendance'] = 0.0;
+          });
+        }
+      }
+
       setState(() {
         _isLoading = false;
       });
-      return;
+    } catch (e) {
+      print("Error: $e");
     }
-
-    final response = await supabase
-        .from('subject_detail')
-        .select('subject_code, subject_name')
-        .eq('subject_year', Student_year ?? '')
-        .eq('division', Student_division ?? '');
-
-    print('Supabase response: ${response.data}');
-    print('Supabase error: ${response.error?.message}');
-
-    if (response.error == null && response.data != null && response.data.isNotEmpty) {
-      List<Map<String, String>> fetchedSubjectData = List<Map<String, String>>.from(
-        response.data.map((item) => {
-          'subject_code': item['subject_code'],
-          'subject_name': item['subject_name'],
-        }),
-      );
-
-      setState(() {
-        subjectData = fetchedSubjectData
-            .map((subject) => {
-                  "name": subject['subject_name'] ?? '',
-                  "code": subject['subject_code'] ?? '',
-                  "attendance": 0.0,
-                })
-            .toList();
-        _isLoading = false; // Stop loading when data is fetched
-      });
-    } else {
-      setState(() {
-        _isLoading = false; // Stop loading if no data or error occurs
-      });
-      print('No data found or error fetching subject data: ${response.error?.message ?? "No data"}');
-    }
-  } catch (e) {
-    setState(() {
-      _isLoading = false; // Stop loading if an exception occurs
-    });
-    print('Error: $e');
-  }
-}
-
-
-
-
-  
-
-
-
-
-
-
-  Future<void> fetchAttendanceCount(List<String> subjectCodes) async {
-    final supabase = Supabase.instance.client;
-
-    for (int i = 0; i < subjectCodes.length; i++) {
-      final subjectCode = subjectCodes[i];
-
-      final totalClassesResponse = await supabase
-          .from('student_attendance')
-          .select()
-          .eq('subject_code', subjectCode);
-
-      if (totalClassesResponse.error == null) {
-        totalClasses.add(totalClassesResponse.length);
-      } else {
-        totalClasses.add(0);
-      }
-
-      final studentPresentResponse = await supabase
-          .from('student_attendance')
-          .select()
-          .eq('subject_code', subjectCode)
-          .eq('prn', StudentPRN ?? '')
-          .eq('attendance_status', true);
-
-      if (studentPresentResponse.error == null) {
-        studentPresent.add(studentPresentResponse.length);
-      } else {
-        studentPresent.add(0);
-      }
-
-      if (totalClasses[i] != 0) {
-        double attendancePercentage = (studentPresent[i] / totalClasses[i]) * 100.0;
-        setState(() {
-          subjectData[i]['attendance'] = attendancePercentage;
-        });
-      } else {
-        setState(() {
-          subjectData[i]['attendance'] = 0.0;
-        });
-      }
-    }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
@@ -184,9 +175,11 @@ class _StudentSubjectDetailState extends State<StudentSubjectDetail> {
             child: ListView.builder(
               itemCount: subjectData.length,
               itemBuilder: (context, index) {
-                return subjectCard(
-                  subjectData[index]['name'],
-                  subjectData[index]['attendance'],
+                return SubjectCard(
+                  subjectName: subjectData[index]['name'],
+                  attendancePercentage: subjectData[index]['attendance'],
+                  presentDays: studentPresent[index],
+                  totalLectures: totalClasses[index],
                 );
               },
             ),
@@ -196,66 +189,113 @@ class _StudentSubjectDetailState extends State<StudentSubjectDetail> {
     );
   }
 }
+class SubjectCard extends StatefulWidget {
+  final String subjectName;
+  final double attendancePercentage;
+  final int presentDays;
+  final int totalLectures;
 
-extension on PostgrestList {
-  get error => null;
-  get data => null;
+  const SubjectCard({
+    Key? key,
+    required this.subjectName,
+    required this.attendancePercentage,
+    required this.presentDays,
+    required this.totalLectures,
+  }) : super(key: key);
+
+  @override
+  _SubjectCardState createState() => _SubjectCardState();
 }
 
-Widget subjectCard(String subjectName, double attendancePercentage) {
-  return Card(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10),
-    ),
-    elevation: 5,
-    margin: EdgeInsets.all(10),
-    child: SizedBox(
-      height: 75,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Flexible(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Text(
-                subjectName,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-                softWrap: true,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
+class _SubjectCardState extends State<SubjectCard> {
+  bool _isExpanded = false; // Track card expansion state
+
+  void _toggleCard() {
+    setState(() {
+      _isExpanded = !_isExpanded; // Toggle the expansion state
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _toggleCard,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        // Remove the fixed height to allow dynamic sizing
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 5,
             ),
-          ),
-          SizedBox(width: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: CircularPercentIndicator(
-              radius: 35.0,
-              lineWidth: 8.0,
-              percent: attendancePercentage / 100,
-              center: Text(
-                "${attendancePercentage.toStringAsFixed(1)}%",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+          ],
+        ),
+        child: Column(
+          mainAxisSize:
+              MainAxisSize.min, // Dynamically adjust height based on content
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Display subject name and attendance percentage
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    widget.subjectName,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    softWrap: true,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                SizedBox(width: 10),
+                CircularPercentIndicator(
+                  radius: 35.0,
+                  lineWidth: 8.0,
+                  percent: widget.attendancePercentage / 100,
+                  center: Text(
+                    "${widget.attendancePercentage.toStringAsFixed(1)}%",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  backgroundColor: widget.attendancePercentage >= 75
+                      ? Colors.green.shade100
+                      : Colors.red.shade100,
+                  progressColor: widget.attendancePercentage >= 75
+                      ? Colors.green
+                      : Colors.red,
+                  circularStrokeCap: CircularStrokeCap.round,
+                ),
+              ],
+            ),
+            // Conditionally display additional information
+            if (_isExpanded)
+              Padding(
+                padding: const EdgeInsets.only(top: 15.0),
+                child: Text(
+                  "Present: ${widget.presentDays} / Total: ${widget.totalLectures}",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.black87,
+                  ),
                 ),
               ),
-              backgroundColor: attendancePercentage >= 75
-                  ? Colors.green.shade100
-                  : Colors.red.shade100,
-              progressColor: attendancePercentage >= 75
-                  ? Colors.green
-                  : Colors.red,
-              circularStrokeCap: CircularStrokeCap.round,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }

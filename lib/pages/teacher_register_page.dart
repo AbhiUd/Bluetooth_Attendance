@@ -223,7 +223,7 @@ class _TeacherRegisterPage2State extends State<TeacherRegisterPage2> {
                             confirmPassTextContoller.text.isNotEmpty) &&
                         (newPassTextContoller.text ==
                             confirmPassTextContoller.text)) {
-                      final teacher_detail = await Supabase.instance.client
+                      final teacherDetail = await Supabase.instance.client
                           .from("teacher_predefined_details")
                           .select()
                           .eq("emailid", widget.emailId);
@@ -233,7 +233,7 @@ class _TeacherRegisterPage2State extends State<TeacherRegisterPage2> {
                           .insert({
                         'emailid': widget.emailId,
                         'password': newPassTextContoller.text,
-                        'name': teacher_detail[0]['name'],
+                        'name': teacherDetail[0]['name'],
                       });
                       print(response);
                       if (response == null) {
