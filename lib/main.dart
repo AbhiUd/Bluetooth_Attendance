@@ -3,6 +3,7 @@ import 'package:bluetooth_attendance/pages/absentee_page.dart';
 import 'package:bluetooth_attendance/pages/blank_page.dart';
 import 'package:bluetooth_attendance/pages/get_report.dart';
 import 'package:bluetooth_attendance/pages/login_page.dart';
+import 'package:bluetooth_attendance/pages/notification_page.dart';
 import 'package:bluetooth_attendance/pages/register_page.dart';
 import 'package:bluetooth_attendance/pages/role.dart';
 import 'package:bluetooth_attendance/pages/scanning_page.dart';
@@ -85,6 +86,7 @@ class MyApp extends StatelessWidget {
         '/scanningpage': (BuildContext context) => const ScanningPage(),
         '/absenteepage': (BuildContext context) => const AbsenteePage(),
         '/registerpage2': (BuildContext context) => const RegisterPage2(),
+        '/notification': (BuildContext context) =>  NotificationPage(),
       },
     );
   }

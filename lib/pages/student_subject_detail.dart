@@ -83,8 +83,6 @@ class _StudentSubjectDetailState extends State<StudentSubjectDetail> {
   Future<void> fetchAttendanceCount() async {
     try {
       final supabase = Supabase.instance.client;
-
-      // Clear lists before adding new data
       totalClasses.clear();
       studentPresent.clear();
 
