@@ -2,6 +2,7 @@ import 'package:bluetooth_attendance/firebase_options.dart';
 import 'package:bluetooth_attendance/pages/absentee_page.dart';
 import 'package:bluetooth_attendance/pages/blank_page.dart';
 import 'package:bluetooth_attendance/pages/login_page.dart';
+import 'package:bluetooth_attendance/pages/notification_page.dart';
 import 'package:bluetooth_attendance/pages/register_page.dart';
 import 'package:bluetooth_attendance/pages/role.dart';
 import 'package:bluetooth_attendance/pages/scanning_page.dart';
@@ -10,7 +11,6 @@ import 'package:bluetooth_attendance/pages/teacher_attendance.dart';
 import 'package:bluetooth_attendance/pages/teacher_landing_page.dart';
 import 'package:bluetooth_attendance/pages/teacher_login_page.dart';
 import 'package:bluetooth_attendance/pages/teacher_register_page.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -84,6 +84,7 @@ class MyApp extends StatelessWidget {
         '/scanningpage': (BuildContext context) => const ScanningPage(),
         '/absenteepage': (BuildContext context) => const AbsenteePage(),
         '/registerpage2': (BuildContext context) => const RegisterPage2(),
+        '/notification': (BuildContext context) =>  NotificationPage(),
       },
     );
   }

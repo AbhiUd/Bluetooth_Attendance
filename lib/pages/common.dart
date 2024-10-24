@@ -36,18 +36,21 @@ class appbarWidget extends StatelessWidget implements PreferredSizeWidget {
       ),
       centerTitle: true,
       actions: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: IconButton(
-            icon: const Icon(
-              Icons.notification_add_outlined,
-              size: 50,
-              color: Colors.white,
-            ),
-            onPressed: () {},
-          ),
-        ),
-      ],
+  Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 10),
+    child: IconButton(
+      icon: const Icon(
+        Icons.notification_add_outlined,
+        size: 50,
+        color: Colors.white,
+      ),
+      onPressed: () {
+         Navigator.of(context).pushNamed('/notification');
+      },
+    ),
+  ),
+],
+
     );
   }
 
@@ -268,3 +271,6 @@ class _DropdownState extends State<Dropdown> {
 String? StudentPRN;
 String? Student_year;
 String? Student_division;
+
+
+
