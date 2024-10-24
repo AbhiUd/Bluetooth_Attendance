@@ -617,9 +617,8 @@ class _TeacherAttendanceState extends State<TeacherAttendance> {
               .eq("class", selectedClass!)
               .eq("division", selectedDiv!);
 
-          subjectCode = response[0]["subjectcode"];
-
           if (response.isNotEmpty) {
+            subjectCode = response[0]["subjectcode"];
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(

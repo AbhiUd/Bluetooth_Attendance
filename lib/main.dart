@@ -1,6 +1,7 @@
 import 'package:bluetooth_attendance/firebase_options.dart';
 import 'package:bluetooth_attendance/pages/absentee_page.dart';
 import 'package:bluetooth_attendance/pages/blank_page.dart';
+import 'package:bluetooth_attendance/pages/get_report.dart';
 import 'package:bluetooth_attendance/pages/login_page.dart';
 import 'package:bluetooth_attendance/pages/register_page.dart';
 import 'package:bluetooth_attendance/pages/role.dart';
@@ -10,17 +11,16 @@ import 'package:bluetooth_attendance/pages/teacher_attendance.dart';
 import 'package:bluetooth_attendance/pages/teacher_landing_page.dart';
 import 'package:bluetooth_attendance/pages/teacher_login_page.dart';
 import 'package:bluetooth_attendance/pages/teacher_register_page.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
- WidgetsFlutterBinding.ensureInitialized();
-await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
- 
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   await Supabase.initialize(
     url: 'https://yibgavrmokwdadpygfdq.supabase.co',
     anonKey:
@@ -47,12 +47,12 @@ class MyApp extends StatelessWidget {
         textTheme: const TextTheme(
           headlineLarge: TextStyle(
             fontSize: 32,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w800,
             color: Colors.white,
           ),
           headlineMedium: TextStyle(
             fontSize: 26,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w800,
             color: Colors.white,
           ),
           headlineSmall: TextStyle(
@@ -81,6 +81,7 @@ class MyApp extends StatelessWidget {
         '/studentpage': (BuildContext context) => const StudentPage(),
         '/teacherpage': (BuildContext context) => const Teacher_Landing_Page(),
         '/attendancepage': (BuildContext context) => const TeacherAttendance(),
+        '/reportpage': (BuildContext context) => const AttendanceReportPage(),
         '/scanningpage': (BuildContext context) => const ScanningPage(),
         '/absenteepage': (BuildContext context) => const AbsenteePage(),
         '/registerpage2': (BuildContext context) => const RegisterPage2(),

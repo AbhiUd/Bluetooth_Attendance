@@ -1,5 +1,6 @@
 import 'package:bluetooth_attendance/components/student_page_comp.dart';
 import 'package:bluetooth_attendance/pages/common.dart';
+import 'package:bluetooth_attendance/pages/get_report.dart';
 import 'package:bluetooth_attendance/pages/teacher_attendance.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -81,11 +82,12 @@ class Teacher_Landing_Page extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: 100),
-              ElevatedButton.icon(icon: Icon(
-            Icons.emoji_people_sharp,
-            color: Colors.black54,
-            size: 30.0,
-          ),
+              ElevatedButton.icon(
+                icon: Icon(
+                  Icons.emoji_people_sharp,
+                  color: Colors.black54,
+                  size: 30.0,
+                ),
                 onPressed: () async {
                   checkBluetooth(context);
                   Navigator.push(
@@ -99,6 +101,7 @@ class Teacher_Landing_Page extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
+                  fixedSize: Size(300, 50),
                   backgroundColor: const Color.fromRGBO(217, 217, 217, 1),
                   foregroundColor: Colors.black,
                   shape: RoundedRectangleBorder(
@@ -115,14 +118,23 @@ class Teacher_Landing_Page extends StatelessWidget {
               ),
               ElevatedButton.icon(
                 icon: Icon(
-            Icons.edit_document,
-            color: Colors.black54,
-            size: 30.0,
-          ),
+                  Icons.edit_document,
+                  color: Colors.black54,
+                  size: 30.0,
+                ),
                 onPressed: () {
-                  Navigator.of(context).pushNamed("");
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation1, animation2) =>
+                          const AttendanceReportPage(),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
+                  fixedSize: Size(300, 50),
                   backgroundColor: const Color.fromRGBO(217, 217, 217, 1),
                   foregroundColor: Colors.black,
                   shape: RoundedRectangleBorder(
