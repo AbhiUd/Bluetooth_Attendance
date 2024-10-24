@@ -25,7 +25,10 @@ class _AbsenteePageState extends State<AbsenteePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirm'),
-          content: Text('Do you want to mark PRN: $prn as present?'),
+          content: Text(
+            'Do you want to mark PRN: $prn as present?',
+            style: TextStyle(color: Colors.black),
+          ),
           actions: <Widget>[
             TextButton(
               child: const Text('No'),

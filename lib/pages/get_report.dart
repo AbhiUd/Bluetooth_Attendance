@@ -229,8 +229,8 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
                   : Text(
                       'Generate Report',
                       style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
                         color: Colors.black,
                       ),
                     ),
@@ -270,10 +270,12 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
         .from('student_attendance')
         .select()
         .eq('subject_code', subjectCode)
+        .eq('division', selectedDiv!)
+        .eq('class', selectedClass!)
         .gte('date', formattedStartDate)
         .lte('date', formattedEndDate)
         .order('date')
-        .order('created_at');
+        .order('created_at'); // Differentiate between lectures
 
     if (response.isEmpty) {
       throw Exception('Failed to fetch attendance data');
@@ -296,22 +298,36 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
     List<String> prnList = [];
     Map<String, int> presentCountMap = {};
     List<String> headerList = ['PRN']; // Start with 'PRN' as the first column
-    Map<String, int> dateLectureCountMap = {}; // Track lecture counts by date
+    Map<String, List<String>> dateLectureCountMap =
+        {}; // Track lectures by date + time
+
+    Set<String> uniqueLectures =
+        {}; // Use a set to track unique lecture combinations
 
     for (var record in attendanceData) {
       String prn = record['prn'];
       String date = record['date'];
+
+      // Extract only up to minutes to group the lectures correctly, ignoring the microseconds
+      String createdAt = record['created_at']
+          .substring(0, 16); // Extract date + hour and minute
+      String dateLectureKey = '$date-$createdAt'; // Unique lecture identifier
+
       bool status = record['attendance_status'];
 
       if (!prnList.contains(prn)) prnList.add(prn);
 
-      // Add attendance status for the student on this date
+      // Add attendance status for the student on this date-lecture combination
       studentAttendanceMap.putIfAbsent(prn, () => {});
-      studentAttendanceMap[prn]!.putIfAbsent(date, () => []);
-      studentAttendanceMap[prn]![date]!.add(status);
+      studentAttendanceMap[prn]!.putIfAbsent(dateLectureKey, () => []);
+      studentAttendanceMap[prn]![dateLectureKey]!.add(status);
 
-      // Track lecture count per date
-      dateLectureCountMap[date] = (dateLectureCountMap[date] ?? 0) + 1;
+      // Ensure the lecture is counted only once
+      if (!uniqueLectures.contains(dateLectureKey)) {
+        uniqueLectures.add(dateLectureKey);
+        dateLectureCountMap.putIfAbsent(date, () => []);
+        dateLectureCountMap[date]!.add(createdAt);
+      }
 
       // Count the number of present days for each student
       presentCountMap[prn] = (presentCountMap[prn] ?? 0) + (status ? 1 : 0);
@@ -320,10 +336,10 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
     // Sort PRN list in ascending order
     prnList.sort();
 
-    // Create headers: PRN, Date1, Date2, etc., plus No. of Days Present and Total Lectures
-    dateLectureCountMap.forEach((date, count) {
-      for (int i = 0; i < count; i++) {
-        headerList.add(date);
+    // Create headers: PRN, Date1, Date1, Date2, etc., plus No. of Days Present and Total Lectures
+    dateLectureCountMap.forEach((date, lectures) {
+      for (var lecture in lectures) {
+        headerList.add(date); // Only the date will appear in the header
       }
     });
     headerList.add("No. of Days Present");
@@ -338,35 +354,31 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
     int rowIndex = 2; // Start from row 2 for student data
     prnList.forEach((prn) {
       sheet.getRangeByIndex(rowIndex, 1).setText(prn); // PRN column
-      int columnIndex = 2; // Start from column 2 for dates
+      int columnIndex = 2; // Start from column 2 for dates + lectures
 
-      dateLectureCountMap.forEach((date, count) {
-        List<bool>? attendanceStatuses = studentAttendanceMap[prn]?[date];
-        if (attendanceStatuses != null) {
-          for (int i = 0; i < count; i++) {
-            if (i < attendanceStatuses.length) {
-              sheet
-                  .getRangeByIndex(rowIndex, columnIndex)
-                  .setNumber(attendanceStatuses[i] ? 1 : 0);
-            } else {
-              sheet.getRangeByIndex(rowIndex, columnIndex).setNumber(0);
-            }
-            columnIndex++;
-          }
-        } else {
-          for (int i = 0; i < count; i++) {
+      dateLectureCountMap.forEach((date, lectures) {
+        lectures.forEach((lectureId) {
+          String dateLectureKey = '$date-$lectureId';
+          List<bool>? attendanceStatuses =
+              studentAttendanceMap[prn]?[dateLectureKey];
+          if (attendanceStatuses != null && attendanceStatuses.isNotEmpty) {
+            sheet
+                .getRangeByIndex(rowIndex, columnIndex)
+                .setNumber(attendanceStatuses.first ? 1 : 0);
+          } else {
             sheet.getRangeByIndex(rowIndex, columnIndex).setNumber(0);
-            columnIndex++;
           }
-        }
+          columnIndex++;
+        });
       });
 
       // Add "No. of Days Present" and "Total Lectures" columns
       sheet
           .getRangeByIndex(rowIndex, columnIndex)
           .setNumber(presentCountMap[prn]?.toDouble() ?? 0);
-      sheet.getRangeByIndex(rowIndex, columnIndex + 1).setNumber(
-          dateLectureCountMap.values.reduce((a, b) => a + b).toDouble());
+      sheet
+          .getRangeByIndex(rowIndex, columnIndex + 1)
+          .setNumber(uniqueLectures.length.toDouble()); // Total unique lectures
 
       rowIndex++;
     });

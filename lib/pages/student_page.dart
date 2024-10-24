@@ -304,31 +304,34 @@ class _StudentPageState extends State<StudentPage> {
       body: Center(
         child: Column(
           children: [
-
-            SizedBox(height: 100,),
-            ElevatedButton.icon(icon: Icon(
-            Icons.broadcast_on_home_outlined,
-            color: Colors.black54,
-            size: 40.0,
-          ),
-                onPressed: () {
+            SizedBox(
+              height: 100,
+            ),
+            ElevatedButton.icon(
+              icon: Icon(
+                Icons.broadcast_on_home_outlined,
+                color: Colors.black54,
+                size: 40.0,
+              ),
+              onPressed: () {
                 if (_bluetoothEnabled && _isSupported) {
                   _toggleAdvertising();
                 } else {
                   _showBluetoothAlert();
                 }
               },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(217, 217, 217, 1),
-                  foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                label: Text(_isAdvertising ? "Stop Broadcast" : "Start Broadcast",
-                  style: TextStyle(fontSize: 30),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromRGBO(217, 217, 217, 1),
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
+              label: Text(
+                _isAdvertising ? "Stop Broadcast" : "Start Broadcast",
+                style: TextStyle(fontSize: 30),
+              ),
+            ),
             // ElevatedButton(
             //   onPressed: () {
             //     if (_bluetoothEnabled && _isSupported) {
@@ -339,36 +342,38 @@ class _StudentPageState extends State<StudentPage> {
             //   },
             //   child: Text(_isAdvertising ? "Stop Broadcast" : "Start Broadcast"),
             // ),
-            SizedBox(height: 100,),
+            SizedBox(
+              height: 100,
+            ),
             ElevatedButton.icon(
               icon: Icon(
-            Icons.school,
-            color: Colors.black54,
-            size: 30.0,
-          ),
-                onPressed: () async {
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation1, animation2) =>
-                          const StudentSubjectDetail(),
-                      transitionDuration: Duration.zero,
-                      reverseTransitionDuration: Duration.zero,
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(217, 217, 217, 1),
-                  foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                Icons.school,
+                color: Colors.black54,
+                size: 30.0,
+              ),
+              onPressed: () async {
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) =>
+                        const StudentSubjectDetail(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
                   ),
-                ),
-                label: const Text(
-                  'check attendence',
-                  style: TextStyle(fontSize: 30),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromRGBO(217, 217, 217, 1),
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
+              label: const Text(
+                'Check Attendence',
+                style: TextStyle(fontSize: 30),
+              ),
+            ),
           ],
         ),
       ),

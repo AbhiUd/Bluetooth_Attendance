@@ -130,6 +130,8 @@ class _ScanningPageState extends State<ScanningPage> {
 
     print('Scanned List: $scannedList');
     print('Subject Code: $subjectCode');
+    print('SelectedClass: $selectedClass');
+    print('SelectedDivision: $selectedDiv');
     for (String prn in scannedList) {
       try {
         final response =
@@ -137,6 +139,8 @@ class _ScanningPageState extends State<ScanningPage> {
           'prn': prn,
           'subject_code': subjectCode, // Replace with the actual subject code
           'date': currentDate,
+          'division': selectedDiv!,
+          'class': selectedClass!,
           'attendance_status': true, // Mark as present
         });
       } catch (error) {
@@ -151,6 +155,8 @@ class _ScanningPageState extends State<ScanningPage> {
           'prn': prn,
           'subject_code': subjectCode,
           'date': currentDate,
+          'division': selectedDiv!,
+          'class': selectedClass!,
           'attendance_status': false,
         });
       } catch (error) {

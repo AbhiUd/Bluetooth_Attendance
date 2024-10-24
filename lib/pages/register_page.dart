@@ -1,5 +1,4 @@
 import 'package:bluetooth_attendance/components/login_page_component.dart';
-import 'package:bluetooth_attendance/pages/common.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -225,9 +224,7 @@ class _RegisterPage2State extends State<RegisterPage2> {
                             confirmPassTextContoller.text.isNotEmpty) &&
                         (newPassTextContoller.text ==
                             confirmPassTextContoller.text)) {
-                      final deviceId = await getDeviceIdentifier();
                       final uuid = generateUUID();
-                      print("DeviceId : $deviceId");
                       final studentDetail = await Supabase.instance.client
                           .from("predefined_details")
                           .select()
@@ -238,7 +235,6 @@ class _RegisterPage2State extends State<RegisterPage2> {
                           .insert({
                         'emailid': widget.emailId,
                         'password': newPassTextContoller.text,
-                        'identifier': deviceId,
                         'uuid': uuid,
                         'prn': studentDetail[0]["prn"],
                         'class': studentDetail[0]["class"],
@@ -246,19 +242,22 @@ class _RegisterPage2State extends State<RegisterPage2> {
                         'name': studentDetail[0]['name'],
                       });
                       print(response);
+                      await saveUUID(uuid);
 
                       final update = await Supabase.instance.client
                           .from("predefined_details")
                           .update({"registered_status": true}).match(
                               {"emailid": widget.emailId});
-                        await FirebaseMessaging.instance.requestPermission();
+                      await FirebaseMessaging.instance.requestPermission();
                       await FirebaseMessaging.instance.getAPNSToken();
-                      final fcmtoken = await FirebaseMessaging.instance.getToken();
+                      final fcmtoken =
+                          await FirebaseMessaging.instance.getToken();
                       if (fcmtoken != null) {
-                        await _setfcmtoken(fcmtoken,studentDetail[0]["prn"]);
+                        await _setfcmtoken(fcmtoken, studentDetail[0]["prn"]);
                       }
-                      FirebaseMessaging.instance.onTokenRefresh.listen((fcmtoken) async {
-                        await _setfcmtoken(fcmtoken,studentDetail[0]["prn"]);
+                      FirebaseMessaging.instance.onTokenRefresh
+                          .listen((fcmtoken) async {
+                        await _setfcmtoken(fcmtoken, studentDetail[0]["prn"]);
                       });
                       if (context.mounted) {
                         Navigator.of(context).pushNamedAndRemoveUntil(
@@ -287,7 +286,6 @@ class _RegisterPage2State extends State<RegisterPage2> {
                         },
                       );
                     }
-
                   },
                 ),
               ],
@@ -298,14 +296,12 @@ class _RegisterPage2State extends State<RegisterPage2> {
     );
   }
 
-
   Future<void> _setfcmtoken(String fcmtoken, String studentPRN) async {
-    try{
+    try {
       final insertResponse = await Supabase.instance.client
-            .from('firebase_token')
-            .insert({'prn': studentPRN, 'token': fcmtoken});
-    }
-    catch(e){
+          .from('firebase_token')
+          .insert({'prn': studentPRN, 'token': fcmtoken});
+    } catch (e) {
       print(e);
     }
   }

@@ -15,10 +15,6 @@
 
 // class _LoginPageState extends State<LoginPage> {
 
-
-
-
-  
 //   late bool _isObscure;
 
 //   final TextEditingController emailTextContoller = TextEditingController();
@@ -184,7 +180,7 @@
 //                       }
 //                      await FirebaseMessaging.instance.requestPermission();
 //                       await FirebaseMessaging.instance.getAPNSToken();
-//                       final fcmtoken = 
+//                       final fcmtoken =
 //                        await FirebaseMessaging.instance.getToken();
 //                        if(fcmtoken != null){
 //                        await _setfcmtoken(fcmtoken);
@@ -299,7 +295,8 @@ class _LoginPageState extends State<LoginPage> {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const InitializationSettings initializationSettings = InitializationSettings(
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
       android: initializationSettingsAndroid,
     );
 
@@ -327,7 +324,8 @@ class _LoginPageState extends State<LoginPage> {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       final notification = message.notification;
       if (notification != null) {
-        _showNotification(message); // Show local notification when in foreground
+        _showNotification(
+            message); // Show local notification when in foreground
       }
     });
   }
@@ -431,7 +429,7 @@ class _LoginPageState extends State<LoginPage> {
                     onTap: () async {
                       if (emailTextContoller.text.isNotEmpty &&
                           passwordTextContoller.text.isNotEmpty) {
-                        final deviceId = await getDeviceIdentifier();
+                        final uuid = await getUUID();
                         final response = await Supabase.instance.client
                             .from('student_details')
                             .select()
@@ -439,18 +437,39 @@ class _LoginPageState extends State<LoginPage> {
                             .eq('password', passwordTextContoller.text);
 
                         if (response.isNotEmpty) {
-                          final identifier = response[0]['identifier'];
-                          if (identifier == deviceId) {
+                          final identifier = response[0]['uuid'];
+                          if (identifier == uuid) {
                             StudentPRN = response[0]['prn'];
                             Student_year = response[0]['class'];
                             Student_division = response[0]['division'];
-                            await saveUUID(response[0]['uuid']);
                             if (context.mounted) {
                               Navigator.of(context).pushNamedAndRemoveUntil(
                                 '/studentpage',
                                 (Route<dynamic> route) => false,
                               );
                             }
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text(
+                                    'You haven\'t registered in this device',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall,
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: const Text('Ok'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                           }
                         } else {
                           if (context.mounted) {
@@ -484,7 +503,8 @@ class _LoginPageState extends State<LoginPage> {
                             return AlertDialog(
                               title: Text(
                                 'Please enter a valid email and password',
-                                style: Theme.of(context).textTheme.headlineSmall,
+                                style:
+                                    Theme.of(context).textTheme.headlineSmall,
                               ),
                               actions: <Widget>[
                                 TextButton(
@@ -537,6 +557,3 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-
-
-

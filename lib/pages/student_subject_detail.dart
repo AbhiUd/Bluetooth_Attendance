@@ -165,7 +165,7 @@ class _StudentSubjectDetailState extends State<StudentSubjectDetail> {
             child: Text(
               "Attendance detail",
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 25, color: Colors.white),
+              style: Theme.of(context).textTheme.headlineLarge,
             ),
           ),
           SizedBox(height: 20),
@@ -187,6 +187,7 @@ class _StudentSubjectDetailState extends State<StudentSubjectDetail> {
     );
   }
 }
+
 class SubjectCard extends StatefulWidget {
   final String subjectName;
   final double attendancePercentage;
